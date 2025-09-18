@@ -376,77 +376,125 @@
             password: "admin123"
         };
 
-        // Data Management
-        class DataManager {
-            static getShops() {
-                return JSON.parse(localStorage.getItem('discountClubShops') || '[]');
-            }
+        // Import Firestore functions and your database connection
+import { db } from "./firebase-config.js";
+import { collection, getDocs, getDoc, addDoc, deleteDoc, updateDoc, doc, query, where, limit } from "firebase/firestore";
 
-            static saveShops(shops) {
-                localStorage.setItem('discountClubShops', JSON.stringify(shops));
-            }
+// Data Management with Firebase Firestore
+export class DataManager {
 
-            static addShop(shop) {
-                const shops = this.getShops();
-                shop.id = Date.now().toString();
-                shops.push(shop);
-                this.saveShops(shops);
-                return shop;
-            }
+    // --- Shop Management ---
 
-            static removeShop(shopId) {
-                const shops = this.getShops();
-                const filteredShops = shops.filter(shop => shop.id !== shopId);
-                this.saveShops(filteredShops);
-                return filteredShops;
-            }
+    /**
+     * Fetches all shops from the Firestore database.
+     * @returns {Promise<Array>} A promise that resolves to an array of shop objects.
+     */
+    static async getShops() {
+        const shopsCol = collection(db, 'shops');
+        const shopSnapshot = await getDocs(shopsCol);
+        const shopList = shopSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return shopList;
+    }
 
-            static getMembers() {
-                return JSON.parse(localStorage.getItem('discountClubMembers') || '[]');
-            }
+    /**
+     * Adds a new shop to the global Firestore database.
+     * @param {object} shopData - The shop data to add.
+     * @returns {Promise<object>} A promise that resolves to the newly created shop data.
+     */
+    static async addShop(shopData) {
+        const docRef = await addDoc(collection(db, 'shops'), shopData);
+        return { id: docRef.id, ...shopData };
+    }
 
-            static saveMembers(members) {
-                localStorage.setItem('discountClubMembers', JSON.stringify(members));
-            }
+    /**
+     * Deletes a shop from the Firestore database using its unique document ID.
+     * @param {string} shopId - The unique ID of the shop document to remove.
+     * @returns {Promise<void>}
+     */
+    static async removeShop(shopId) {
+        await deleteDoc(doc(db, 'shops', shopId));
+    }
 
-            static addMember(member) {
-                const members = this.getMembers();
-                member.id = Date.now().toString();
-                member.memberId = this.generateMemberId();
-                member.joinDate = new Date().toLocaleDateString();
-                member.physicalCardRequested = false;
-                members.push(member);
-                this.saveMembers(members);
-                return member;
-            }
+    // --- Member Management ---
 
-            static generateMemberId() {
-                return 'DC-' + Math.floor(Math.random() * 90000 + 10000);
-            }
+    /**
+     * Fetches all members from the Firestore database.
+     * @returns {Promise<Array>} A promise that resolves to an array of member objects.
+     */
+    static async getMembers() {
+        const membersCol = collection(db, 'members');
+        const memberSnapshot = await getDocs(membersCol);
+        const memberList = memberSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return memberList;
+    }
 
-            static getCurrentMember() {
-                const currentMemberId = localStorage.getItem('currentMemberId');
-                if (!currentMemberId) return null;
-                
-                const members = this.getMembers();
-                return members.find(member => member.memberId === currentMemberId);
-            }
+    /**
+     * Adds a new member to the global Firestore database.
+     * @param {object} memberData - The member data to add.
+     * @returns {Promise<object>} A promise that resolves to the newly created member data.
+     */
+    static async addMember(memberData) {
+        // Add custom fields before saving
+        const newMemberData = {
+            ...memberData,
+            memberId: this.generateMemberId(), // 'DC-12345'
+            joinDate: new Date().toISOString(),
+            physicalCardRequested: false
+        };
+        const docRef = await addDoc(collection(db, 'members'), newMemberData);
+        return { id: docRef.id, ...newMemberData };
+    }
 
-            static setCurrentMember(memberId) {
-                localStorage.setItem('currentMemberId', memberId);
-            }
+    /**
+     * Updates an existing member's data in Firestore.
+     * @param {string} docId - The Firestore document ID of the member.
+     * @param {object} updates - An object with the fields to update.
+     * @returns {Promise<void>}
+     */
+    static async updateMember(docId, updates) {
+        const memberDoc = doc(db, "members", docId);
+        await updateDoc(memberDoc, updates);
+    }
 
-            static updateMember(memberId, updates) {
-                const members = this.getMembers();
-                const memberIndex = members.findIndex(member => member.memberId === memberId);
-                if (memberIndex !== -1) {
-                    members[memberIndex] = { ...members[memberIndex], ...updates };
-                    this.saveMembers(members);
-                    return members[memberIndex];
-                }
-                return null;
-            }
+    /**
+     * Generates a unique, user-facing member ID.
+     * @returns {string} The formatted member ID.
+     */
+    static generateMemberId() {
+        return 'DC-' + Math.floor(Math.random() * 90000 + 10000);
+    }
+    
+    // --- Current Session / Member Card ---
+    
+    /**
+     * Gets the current member's full, updated data from Firestore.
+     * It reads the memberId from localStorage to know who the current user is.
+     * @returns {Promise<object|null>} The full member object or null if not found.
+     */
+    static async getCurrentMember() {
+        const currentMemberId = localStorage.getItem('currentMemberId');
+        if (!currentMemberId) return null;
+
+        // Query Firestore to find the member with this specific memberId
+        const q = query(collection(db, "members"), where("memberId", "==", currentMemberId), limit(1));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+            return null; // No member found with that ID
         }
+        
+        const memberDoc = querySnapshot.docs[0];
+        return { id: memberDoc.id, ...memberDoc.data() };
+    }
+
+    /**
+     * Saves the current member's user-facing ID to localStorage for session tracking.
+     * @param {string} memberId - The 'DC-12345' ID of the member.
+     */
+    static setCurrentMember(memberId) {
+        localStorage.setItem('currentMemberId', memberId);
+    }
+}
 
         // Authentication Management
         class AuthManager {
@@ -1367,5 +1415,29 @@
             MembershipCardManager.init();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'980a82e5a2d90e98',t:'MTc1ODEzMjExMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'980a82e5a2d90e98',t:'MTc1ODEzMjExMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyDNwC353eJkmQlyevZGi4Pnm94tiUQCbTo",
+    authDomain: "dc-clube.firebaseapp.com",
+    projectId: "dc-clube",
+    storageBucket: "dc-clube.firebasestorage.app",
+    messagingSenderId: "776134787311",
+    appId: "1:776134787311:web:78665dfb4203fe81925b1a",
+    measurementId: "G-QV0K9XZRCM"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+</body>
 </html>
