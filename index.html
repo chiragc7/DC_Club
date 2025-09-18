@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiscountClub - Exclusive Deals & Discounts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+        }
+        .file-upload-area {
+            border: 2px dashed #d1d5db;
+            transition: all 0.3s ease;
+        }
+        .file-upload-area:hover {
+            border-color: #8b5cf6;
+            background-color: #faf5ff;
+        }
+        .file-upload-area.dragover {
+            border-color: #8b5cf6;
+            background-color: #f3e8ff;
+        }
+        .membership-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .card-shine {
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-blue-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-purple-600">💳 DiscountClub</h1>
+                </div>
+                <div class="flex space-x-4">
+                    <button id="userSectionBtn" class="nav-btn bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                        🏪 Shops
+                    </button>
+                    <button id="membershipBtn" class="nav-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        👤 Join Club
+                    </button>
+                    <button id="myCardBtn" class="nav-btn bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors hidden">
+                        🎫 My Card
+                    </button>
+                    <button id="adminSectionBtn" class="nav-btn bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                        🔒 Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- User Section - Shop Listings -->
+    <div id="userSection" class="section">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4">Discover Amazing Discounts</h2>
+                <p class="text-xl text-gray-600 mb-8">Exclusive deals from your favorite local shops</p>
+               
+                <!-- Search Filter -->
+                <div class="max-w-md mx-auto">
+                    <select id="cityFilter" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <option value="">All Cities</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Shop Grid -->
+            <div id="shopGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Shop cards will be inserted here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="text-center py-16">
+                <div class="text-6xl mb-4">🏪</div>
+                <h3 class="text-2xl font-semibold text-gray-600 mb-2">No shops yet</h3>
+                <p class="text-gray-500">Check back soon for amazing deals!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Membership Section -->
+    <div id="membershipSection" class="section hidden">
+        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="text-center mb-8">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Join DiscountClub</h2>
+                    <p class="text-gray-600">Get exclusive access to member-only discounts and deals</p>
+                </div>
+
+                <form id="membershipForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                            <input type="text" id="firstName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                            <input type="text" id="lastName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                        <input type="tel" id="phone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                        <input type="text" id="memberCity" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+
+                    <button type="submit" class="w-full bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors font-semibold">
+                        Join DiscountClub 🎊
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <p class="text-gray-500 text-sm">
+                        Want to share this form? 
+                        <a href="register.html" target="_blank" class="text-purple-600 hover:text-purple-700 underline">
+                            Direct registration link
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Card Section -->
+    <div id="myCardSection" class="section hidden">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">🎫 My Membership Card</h2>
+                <p class="text-gray-600">Your exclusive DiscountClub membership</p>
+            </div>
+
+            <div id="membershipCard" class="max-w-md mx-auto mb-8">
+                <!-- Digital membership card will be inserted here -->
+            </div>
+
+            <!-- Physical Card Request -->
+            <div class="max-w-2xl mx-auto">
+                <div id="physicalCardSection" class="bg-white rounded-2xl shadow-xl p-6">
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Want a Physical Card?</h3>
+                        <p class="text-gray-600">Get your membership card delivered to your address</p>
+                    </div>
+
+                    <div id="requestPhysicalCard" class="text-center">
+                        <button id="requestCardBtn" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                            📮 Request Physical Card
+                        </button>
+                    </div>
+
+                    <form id="physicalCardForm" class="hidden space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Full Address</label>
+                            <textarea id="fullAddress" required rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Enter your complete postal address"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Pincode</label>
+                            <input type="text" id="pincode" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Enter your pincode">
+                        </div>
+
+                        <div class="flex space-x-3">
+                            <button type="button" id="cancelRequest" class="flex-1 bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit" class="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                                Submit Request
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="cardRequestSuccess" class="hidden text-center py-6">
+                        <div class="text-4xl mb-4">✅</div>
+                        <h3 class="text-xl font-semibold text-green-600 mb-2">Request Submitted!</h3>
+                        <p class="text-gray-600">Your physical card will be processed and delivered within 7-10 business days.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Section -->
+    <div id="adminSection" class="section hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">🔒 Admin Dashboard</h2>
+                <p class="text-gray-600">Manage shops and view member registrations</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Add Shop Form -->
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-6">Add New Shop</h3>
+                    <form id="shopForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Shop Name</label>
+                            <input type="text" id="shopName" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                            <textarea id="shopDescription" required rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Discount %</label>
+                                <input type="number" id="shopDiscount" required min="1" max="99" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                                <input type="text" id="shopCity" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <!-- File Upload Area -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Shop Photos (1-10 images)</label>
+                            <div id="fileUploadArea" class="file-upload-area rounded-lg p-6 text-center cursor-pointer">
+                                <input type="file" id="shopPhoto" accept="image/*" multiple required class="hidden">
+                                <div id="uploadPrompt">
+                                    <div class="text-4xl mb-2">📸</div>
+                                    <p class="text-gray-600 mb-2">Click to upload or drag and drop</p>
+                                    <p class="text-sm text-gray-500">PNG, JPG, GIF up to 5MB each • 1-10 images</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Image Preview Grid -->
+                            <div id="imagePreviewGrid" class="hidden mt-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-sm font-medium text-gray-700">Uploaded Images (<span id="imageCount">0</span>/10)</span>
+                                    <button type="button" id="addMoreImages" class="text-purple-600 hover:text-purple-700 text-sm font-medium">+ Add More</button>
+                                </div>
+                                <div id="previewContainer" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    <!-- Image previews will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                            Add Shop
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Manage Shops -->
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-semibold text-gray-800">Manage Shops</h3>
+                        <span id="shopCount" class="text-sm text-gray-500">0 shops</span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <select id="shopCityFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="">All Cities</option>
+                        </select>
+                    </div>
+
+                    <div id="shopsList" class="space-y-3 max-h-96 overflow-y-auto">
+                        <!-- Shops will be inserted here -->
+                    </div>
+
+                    <div id="noShops" class="text-center py-8 text-gray-500 hidden">
+                        No shops added yet
+                    </div>
+                </div>
+
+                <!-- Members List -->
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-semibold text-gray-800">Registered Members</h3>
+                        <button id="downloadCsv" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                            📥 Download CSV
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <select id="memberCityFilter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="">All Cities</option>
+                        </select>
+                    </div>
+
+                    <div id="membersList" class="space-y-3 max-h-96 overflow-y-auto">
+                        <!-- Members will be inserted here -->
+                    </div>
+
+                    <div id="noMembers" class="text-center py-8 text-gray-500 hidden">
+                        No members registered yet
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full">
+            <div class="p-8">
+                <div class="text-center mb-6">
+                    <div class="text-4xl mb-4">🔒</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Admin Access</h2>
+                    <p class="text-gray-600">Enter your credentials to access the admin dashboard</p>
+                </div>
+                
+                <form id="adminLoginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                        <input type="text" id="adminUsername" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Enter username">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="adminPassword" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Enter password">
+                    </div>
+                    
+                    <div id="loginError" class="text-red-500 text-sm hidden">
+                        ❌ Invalid credentials. Please try again.
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button type="button" id="cancelLogin" class="flex-1 bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" class="flex-1 bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                            Login
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop Detail Modal -->
+    <div id="shopModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div id="modalContent">
+                <!-- Modal content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const ADMIN_CREDENTIALS = {
+            username: "admin",
+            password: "admin123"
+        };
+
+        // Data Management
+        class DataManager {
+            static getShops() {
+                return JSON.parse(localStorage.getItem('discountClubShops') || '[]');
+            }
+
+            static saveShops(shops) {
+                localStorage.setItem('discountClubShops', JSON.stringify(shops));
+            }
+
+            static addShop(shop) {
+                const shops = this.getShops();
+                shop.id = Date.now().toString();
+                shops.push(shop);
+                this.saveShops(shops);
+                return shop;
+            }
+
+            static removeShop(shopId) {
+                const shops = this.getShops();
+                const filteredShops = shops.filter(shop => shop.id !== shopId);
+                this.saveShops(filteredShops);
+                return filteredShops;
+            }
+
+            static getMembers() {
+                return JSON.parse(localStorage.getItem('discountClubMembers') || '[]');
+            }
+
+            static saveMembers(members) {
+                localStorage.setItem('discountClubMembers', JSON.stringify(members));
+            }
+
+            static addMember(member) {
+                const members = this.getMembers();
+                member.id = Date.now().toString();
+                member.memberId = this.generateMemberId();
+                member.joinDate = new Date().toLocaleDateString();
+                member.physicalCardRequested = false;
+                members.push(member);
+                this.saveMembers(members);
+                return member;
+            }
+
+            static generateMemberId() {
+                return 'DC-' + Math.floor(Math.random() * 90000 + 10000);
+            }
+
+            static getCurrentMember() {
+                const currentMemberId = localStorage.getItem('currentMemberId');
+                if (!currentMemberId) return null;
+                
+                const members = this.getMembers();
+                return members.find(member => member.memberId === currentMemberId);
+            }
+
+            static setCurrentMember(memberId) {
+                localStorage.setItem('currentMemberId', memberId);
+            }
+
+            static updateMember(memberId, updates) {
+                const members = this.getMembers();
+                const memberIndex = members.findIndex(member => member.memberId === memberId);
+                if (memberIndex !== -1) {
+                    members[memberIndex] = { ...members[memberIndex], ...updates };
+                    this.saveMembers(members);
+                    return members[memberIndex];
+                }
+                return null;
+            }
+        }
+
+        // Authentication Management
+        class AuthManager {
+            static showLoginModal() {
+                document.getElementById('adminLoginModal').classList.remove('hidden');
+                document.getElementById('adminUsername').focus();
+                document.getElementById('loginError').classList.add('hidden');
+                
+                // Clear previous values
+                document.getElementById('adminUsername').value = '';
+                document.getElementById('adminPassword').value = '';
+            }
+            
+            static hideLoginModal() {
+                document.getElementById('adminLoginModal').classList.add('hidden');
+            }
+            
+            static validateCredentials(username, password) {
+                return username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password;
+            }
+            
+            static init() {
+                const loginForm = document.getElementById('adminLoginForm');
+                const cancelBtn = document.getElementById('cancelLogin');
+                const loginError = document.getElementById('loginError');
+                
+                loginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    const username = document.getElementById('adminUsername').value;
+                    const password = document.getElementById('adminPassword').value;
+                    
+                    if (this.validateCredentials(username, password)) {
+                        this.hideLoginModal();
+                        NavigationManager.showSection('adminSection');
+                        loginError.classList.add('hidden');
+                    } else {
+                        loginError.classList.remove('hidden');
+                        document.getElementById('adminPassword').value = '';
+                        document.getElementById('adminPassword').focus();
+                    }
+                });
+                
+                cancelBtn.addEventListener('click', () => {
+                    this.hideLoginModal();
+                });
+                
+                // Close modal when clicking outside
+                document.getElementById('adminLoginModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'adminLoginModal') {
+                        this.hideLoginModal();
+                    }
+                });
+            }
+        }
+
+        // Membership Card Management
+        class MembershipCardManager {
+            static generateCard(member) {
+                return `
+                    <div class="membership-card rounded-2xl p-8 text-white relative overflow-hidden">
+                        <div class="card-shine absolute inset-0"></div>
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <h3 class="text-2xl font-bold">DiscountClub</h3>
+                                    <p class="text-purple-200">Premium Member</p>
+                                </div>
+                                <div class="text-3xl">💳</div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <p class="text-purple-200 text-sm mb-1">Member Name</p>
+                                <p class="text-xl font-semibold">${member.firstName} ${member.lastName}</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <p class="text-purple-200 text-sm mb-1">Member ID</p>
+                                    <p class="text-lg font-mono font-bold">${member.memberId}</p>
+                                </div>
+                                <div>
+                                    <p class="text-purple-200 text-sm mb-1">City</p>
+                                    <p class="text-lg">${member.city}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-purple-200 text-sm mb-1">Member Since</p>
+                                    <p class="text-sm">${member.joinDate}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-purple-200 text-sm">Valid Until</p>
+                                    <p class="text-sm">Lifetime</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            static init() {
+                const requestCardBtn = document.getElementById('requestCardBtn');
+                const physicalCardForm = document.getElementById('physicalCardForm');
+                const requestPhysicalCard = document.getElementById('requestPhysicalCard');
+                const cancelRequest = document.getElementById('cancelRequest');
+                const cardRequestSuccess = document.getElementById('cardRequestSuccess');
+
+                requestCardBtn.addEventListener('click', () => {
+                    requestPhysicalCard.classList.add('hidden');
+                    physicalCardForm.classList.remove('hidden');
+                });
+
+                cancelRequest.addEventListener('click', () => {
+                    physicalCardForm.classList.add('hidden');
+                    requestPhysicalCard.classList.remove('hidden');
+                    physicalCardForm.reset();
+                });
+
+                physicalCardForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    const currentMember = DataManager.getCurrentMember();
+                    if (!currentMember) return;
+
+                    const updates = {
+                        physicalCardRequested: true,
+                        fullAddress: document.getElementById('fullAddress').value,
+                        pincode: document.getElementById('pincode').value,
+                        cardRequestDate: new Date().toLocaleDateString()
+                    };
+
+                    DataManager.updateMember(currentMember.memberId, updates);
+                    
+                    physicalCardForm.classList.add('hidden');
+                    cardRequestSuccess.classList.remove('hidden');
+                });
+            }
+        }
+
+        // File Upload Management
+        class FileUploadManager {
+            static uploadedImages = [];
+
+            static init() {
+                const fileInput = document.getElementById('shopPhoto');
+                const uploadArea = document.getElementById('fileUploadArea');
+                const addMoreBtn = document.getElementById('addMoreImages');
+
+                // Click to upload
+                uploadArea.addEventListener('click', () => {
+                    if (this.uploadedImages.length >= 10) {
+                        alert('Maximum 10 images allowed');
+                        return;
+                    }
+                    fileInput.click();
+                });
+
+                // Add more images button
+                addMoreBtn.addEventListener('click', () => {
+                    if (this.uploadedImages.length >= 10) {
+                        alert('Maximum 10 images allowed');
+                        return;
+                    }
+                    fileInput.click();
+                });
+
+                // File selection
+                fileInput.addEventListener('change', (e) => {
+                    const files = Array.from(e.target.files);
+                    this.handleMultipleFileUpload(files);
+                });
+
+                // Drag and drop
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                });
+
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.classList.remove('dragover');
+                });
+
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+                    this.handleMultipleFileUpload(files);
+                });
+            }
+
+            static handleMultipleFileUpload(files) {
+                // Check if adding these files would exceed the limit
+                const totalFiles = this.uploadedImages.length + files.length;
+                if (totalFiles > 10) {
+                    const allowedCount = 10 - this.uploadedImages.length;
+                    alert(`You can only add ${allowedCount} more image(s). Maximum 10 images allowed.`);
+                    files = files.slice(0, allowedCount);
+                }
+
+                // Process each file
+                files.forEach(file => {
+                    this.handleSingleFileUpload(file);
+                });
+            }
+
+            static handleSingleFileUpload(file) {
+                // Validate file size (5MB limit)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`File "${file.name}" is too large. Maximum size is 5MB.`);
+                    return;
+                }
+
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    alert(`"${file.name}" is not a valid image file.`);
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const base64String = e.target.result;
+                    const imageData = {
+                        id: Date.now() + Math.random(),
+                        name: file.name,
+                        base64: base64String
+                    };
+                    this.uploadedImages.push(imageData);
+                    this.updateImagePreview();
+                };
+                reader.readAsDataURL(file);
+            }
+
+            static updateImagePreview() {
+                const uploadPrompt = document.getElementById('uploadPrompt');
+                const imagePreviewGrid = document.getElementById('imagePreviewGrid');
+                const previewContainer = document.getElementById('previewContainer');
+                const imageCount = document.getElementById('imageCount');
+                const addMoreBtn = document.getElementById('addMoreImages');
+
+                if (this.uploadedImages.length === 0) {
+                    uploadPrompt.classList.remove('hidden');
+                    imagePreviewGrid.classList.add('hidden');
+                    return;
+                }
+
+                uploadPrompt.classList.add('hidden');
+                imagePreviewGrid.classList.remove('hidden');
+                imageCount.textContent = this.uploadedImages.length;
+
+                // Update add more button visibility
+                if (this.uploadedImages.length >= 10) {
+                    addMoreBtn.style.display = 'none';
+                } else {
+                    addMoreBtn.style.display = 'inline-block';
+                }
+
+                // Render image previews
+                previewContainer.innerHTML = this.uploadedImages.map(image => `
+                    <div class="relative group">
+                        <img src="${image.base64}" alt="${image.name}" class="w-full h-24 object-cover rounded-lg">
+                        <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity" onclick="FileUploadManager.removeImage('${image.id}')">
+                            ×
+                        </button>
+                        <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-lg truncate">
+                            ${image.name}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            static removeImage(imageId) {
+                this.uploadedImages = this.uploadedImages.filter(image => image.id != imageId);
+                this.updateImagePreview();
+            }
+
+            static clearAllImages() {
+                this.uploadedImages = [];
+                const fileInput = document.getElementById('shopPhoto');
+                fileInput.value = '';
+                this.updateImagePreview();
+            }
+
+            static getUploadedImages() {
+                return this.uploadedImages.map(image => image.base64);
+            }
+
+            static hasImages() {
+                return this.uploadedImages.length > 0;
+            }
+        }
+
+        // Navigation Management
+        class NavigationManager {
+            static init() {
+                document.getElementById('userSectionBtn').addEventListener('click', () => this.showSection('userSection'));
+                document.getElementById('membershipBtn').addEventListener('click', () => this.showSection('membershipSection'));
+                document.getElementById('myCardBtn').addEventListener('click', () => this.showSection('myCardSection'));
+                document.getElementById('adminSectionBtn').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    AuthManager.showLoginModal();
+                });
+                
+                this.checkMembershipStatus();
+                this.showSection('userSection');
+            }
+
+            static checkMembershipStatus() {
+                const currentMember = DataManager.getCurrentMember();
+                const myCardBtn = document.getElementById('myCardBtn');
+                const membershipBtn = document.getElementById('membershipBtn');
+                
+                if (currentMember) {
+                    myCardBtn.classList.remove('hidden');
+                    membershipBtn.textContent = '👤 My Account';
+                } else {
+                    myCardBtn.classList.add('hidden');
+                    membershipBtn.textContent = '👤 Join Club';
+                }
+            }
+
+            static showSection(sectionId) {
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.add('hidden');
+                });
+                document.getElementById(sectionId).classList.remove('hidden');
+                document.getElementById(sectionId).classList.add('fade-in');
+
+                // Update nav buttons
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('ring-2', 'ring-offset-2');
+                });
+                
+                if (sectionId === 'userSection') {
+                    document.getElementById('userSectionBtn').classList.add('ring-2', 'ring-offset-2', 'ring-purple-300');
+                    ShopManager.loadShops();
+                } else if (sectionId === 'membershipSection') {
+                    document.getElementById('membershipBtn').classList.add('ring-2', 'ring-offset-2', 'ring-blue-300');
+                } else if (sectionId === 'myCardSection') {
+                    document.getElementById('myCardBtn').classList.add('ring-2', 'ring-offset-2', 'ring-green-300');
+                    this.loadMembershipCard();
+                } else if (sectionId === 'adminSection') {
+                    document.getElementById('adminSectionBtn').classList.add('ring-2', 'ring-offset-2', 'ring-gray-300');
+                    AdminManager.loadMembers();
+                    AdminManager.loadShopsForManagement();
+                }
+            }
+
+            static loadMembershipCard() {
+                const currentMember = DataManager.getCurrentMember();
+                if (!currentMember) {
+                    this.showSection('membershipSection');
+                    return;
+                }
+
+                const cardContainer = document.getElementById('membershipCard');
+                cardContainer.innerHTML = MembershipCardManager.generateCard(currentMember);
+
+                // Update physical card section based on request status
+                const requestPhysicalCard = document.getElementById('requestPhysicalCard');
+                const cardRequestSuccess = document.getElementById('cardRequestSuccess');
+                const physicalCardForm = document.getElementById('physicalCardForm');
+
+                if (currentMember.physicalCardRequested) {
+                    requestPhysicalCard.classList.add('hidden');
+                    physicalCardForm.classList.add('hidden');
+                    cardRequestSuccess.classList.remove('hidden');
+                } else {
+                    requestPhysicalCard.classList.remove('hidden');
+                    physicalCardForm.classList.add('hidden');
+                    cardRequestSuccess.classList.add('hidden');
+                }
+            }
+        }
+
+        // Shop Management
+        class ShopManager {
+            static init() {
+                this.loadShops();
+                this.setupCityFilter();
+                this.setupModal();
+            }
+
+            static loadShops() {
+                const shops = DataManager.getShops();
+                const grid = document.getElementById('shopGrid');
+                const emptyState = document.getElementById('emptyState');
+
+                if (shops.length === 0) {
+                    grid.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+                this.renderShops(shops);
+                this.updateCityFilter();
+            }
+
+            static renderShops(shops) {
+                const grid = document.getElementById('shopGrid');
+                const cityFilter = document.getElementById('cityFilter').value;
+                
+                const filteredShops = cityFilter ? 
+                    shops.filter(shop => shop.city.toLowerCase().includes(cityFilter.toLowerCase())) : 
+                    shops;
+
+                grid.innerHTML = filteredShops.map(shop => `
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer shop-card" data-shop-id="${shop.id}">
+                        <div class="relative">
+                            <img src="${shop.photo}" alt="${shop.name}" class="w-full h-48 object-cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgNzVIMjI1VjEyNUgxNzVWNzVaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0xOTAgOTBIMjEwVjExMEgxOTBWOTBaIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOUI5QkEwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCI+U2hvcCBJbWFnZTwvdGV4dD4KPC9zdmc+'; this.alt='Shop image placeholder';">
+                            <div class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full font-bold text-lg">
+                                ${shop.discount}% OFF
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">${shop.name}</h3>
+                            <p class="text-gray-600 mb-3 line-clamp-2">${shop.description}</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-500">📍 ${shop.city}</span>
+                                <button class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add click listeners
+                document.querySelectorAll('.shop-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        const shopId = card.dataset.shopId;
+                        this.showShopModal(shopId);
+                    });
+                });
+            }
+
+            static setupCityFilter() {
+                document.getElementById('cityFilter').addEventListener('change', () => {
+                    this.loadShops();
+                });
+            }
+
+            static updateCityFilter() {
+                const shops = DataManager.getShops();
+                const cities = [...new Set(shops.map(shop => shop.city))].sort();
+                const filter = document.getElementById('cityFilter');
+                const currentValue = filter.value;
+                
+                filter.innerHTML = '<option value="">All Cities</option>' + 
+                    cities.map(city => `<option value="${city}">${city}</option>`).join('');
+                filter.value = currentValue;
+            }
+
+            static setupModal() {
+                const modal = document.getElementById('shopModal');
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        this.hideShopModal();
+                    }
+                });
+            }
+
+            static showShopModal(shopId) {
+                const shops = DataManager.getShops();
+                const shop = shops.find(s => s.id === shopId);
+                if (!shop) return;
+
+                // Get all photos (new format) or fallback to single photo (old format)
+                const photos = shop.photos || [shop.photo];
+                const mainPhoto = photos[0];
+
+                const modalContent = document.getElementById('modalContent');
+                modalContent.innerHTML = `
+                    <div class="relative">
+                        <img id="mainShopImage" src="${mainPhoto}" alt="${shop.name}" class="w-full h-64 object-cover" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgNzVIMjI1VjEyNUgxNzVWNzVaIiBmaWxsPSIjOUI5QkEwIi8+CjxwYXRoIGQ9Ik0xOTAgOTBIMjEwVjExMEgxOTBWOTBaIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOUI5QkEwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCI+U2hvcCBJbWFnZTwvdGV4dD4KPC9zdmc+'; this.alt='Shop image placeholder';">
+                        <button id="closeModal" class="absolute top-4 right-4 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 transition-all">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                        <div class="absolute bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full font-bold text-xl">
+                            ${shop.discount}% OFF
+                        </div>
+                        ${photos.length > 1 ? `
+                            <div class="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
+                                📸 ${photos.length} photos
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${photos.length > 1 ? `
+                        <div class="p-4 bg-gray-50">
+                            <div class="flex space-x-2 overflow-x-auto">
+                                ${photos.map((photo, index) => `
+                                    <img src="${photo}" alt="${shop.name} ${index + 1}" 
+                                         class="w-16 h-16 object-cover rounded-lg cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all ${index === 0 ? 'ring-2 ring-purple-500' : ''}" 
+                                         onclick="ShopManager.changeMainImage('${photo}', this)">
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="p-8">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">${shop.name}</h2>
+                        <p class="text-gray-600 mb-6 text-lg leading-relaxed">${shop.description}</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center text-gray-500">
+                                <span class="text-lg">📍 ${shop.city}</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm text-gray-500 mb-1">Member Discount</div>
+                                <div class="text-3xl font-bold text-red-500">${shop.discount}% OFF</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('closeModal').addEventListener('click', () => {
+                    this.hideShopModal();
+                });
+
+                document.getElementById('shopModal').classList.remove('hidden');
+            }
+
+            static changeMainImage(photoSrc, thumbnailElement) {
+                const mainImage = document.getElementById('mainShopImage');
+                mainImage.src = photoSrc;
+                
+                // Update thumbnail selection
+                document.querySelectorAll('#modalContent img[onclick]').forEach(img => {
+                    img.classList.remove('ring-2', 'ring-purple-500');
+                });
+                thumbnailElement.classList.add('ring-2', 'ring-purple-500');
+            }
+
+            static hideShopModal() {
+                document.getElementById('shopModal').classList.add('hidden');
+            }
+        }
+
+        // Membership Management
+        class MembershipManager {
+            static init() {
+                document.getElementById('membershipForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleMembershipSubmission();
+                });
+            }
+
+            static handleMembershipSubmission() {
+                const formData = {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    city: document.getElementById('memberCity').value
+                };
+
+                const newMember = DataManager.addMember(formData);
+                DataManager.setCurrentMember(newMember.memberId);
+                
+                // Show success message with membership card
+                const form = document.getElementById('membershipForm');
+                form.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-6xl mb-4">🎉</div>
+                        <h3 class="text-2xl font-bold text-green-600 mb-4">Welcome to DiscountClub!</h3>
+                        <p class="text-gray-600 mb-6">Your membership has been activated. Here's your digital membership card!</p>
+                        
+                        <div class="max-w-sm mx-auto mb-6">
+                            ${MembershipCardManager.generateCard(newMember)}
+                        </div>
+                        
+                        <button id="viewMyCard" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors mr-3">
+                            🎫 View My Card
+                        </button>
+                        <button id="exploreShops" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+                            🏪 Explore Shops
+                        </button>
+                    </div>
+                `;
+
+                document.getElementById('viewMyCard').addEventListener('click', () => {
+                    NavigationManager.checkMembershipStatus();
+                    NavigationManager.showSection('myCardSection');
+                });
+
+                document.getElementById('exploreShops').addEventListener('click', () => {
+                    NavigationManager.checkMembershipStatus();
+                    NavigationManager.showSection('userSection');
+                });
+            }
+        }
+
+        // Admin Management
+        class AdminManager {
+            static init() {
+                document.getElementById('shopForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleShopSubmission();
+                });
+
+                document.getElementById('downloadCsv').addEventListener('click', () => {
+                    this.downloadMembersCSV();
+                });
+
+                document.getElementById('memberCityFilter').addEventListener('change', () => {
+                    this.loadMembers();
+                });
+
+                document.getElementById('shopCityFilter').addEventListener('change', () => {
+                    this.loadShopsForManagement();
+                });
+            }
+
+            static handleShopSubmission() {
+                console.log('Shop form submitted'); // Debug log
+                
+                // Get form values
+                const name = document.getElementById('shopName').value.trim();
+                const description = document.getElementById('shopDescription').value.trim();
+                const discountValue = document.getElementById('shopDiscount').value;
+                const city = document.getElementById('shopCity').value.trim();
+                
+                console.log('Form values:', { name, description, discountValue, city }); // Debug log
+                
+                // Detailed validation with specific error messages
+                if (!name) {
+                    alert('❌ Please enter a shop name');
+                    document.getElementById('shopName').focus();
+                    return;
+                }
+                
+                if (!description) {
+                    alert('❌ Please enter a shop description');
+                    document.getElementById('shopDescription').focus();
+                    return;
+                }
+                
+                if (!discountValue || isNaN(discountValue)) {
+                    alert('❌ Please enter a valid discount percentage');
+                    document.getElementById('shopDiscount').focus();
+                    return;
+                }
+                
+                const discount = parseInt(discountValue);
+                if (discount < 1 || discount > 99) {
+                    alert('❌ Discount must be between 1 and 99');
+                    document.getElementById('shopDiscount').focus();
+                    return;
+                }
+                
+                if (!city) {
+                    alert('❌ Please enter a city name');
+                    document.getElementById('shopCity').focus();
+                    return;
+                }
+                
+                // Check if at least one image is uploaded
+                if (!FileUploadManager.hasImages()) {
+                    alert('❌ Please upload at least one image for the shop');
+                    return;
+                }
+                
+                // Get all uploaded images
+                const images = FileUploadManager.getUploadedImages();
+                console.log('Images to save:', images.length); // Debug log
+                
+                const formData = {
+                    name: name,
+                    description: description,
+                    discount: discount,
+                    city: city,
+                    photos: images, // Store all images
+                    photo: images[0] // Keep first image as main photo for backward compatibility
+                };
+
+                console.log('Attempting to save shop:', formData); // Debug log
+
+                try {
+                    // Add shop to storage
+                    const newShop = DataManager.addShop(formData);
+                    console.log('Shop added successfully:', newShop);
+                    
+                    // Show success message
+                    const button = document.querySelector('#shopForm button[type="submit"]');
+                    const originalText = button.textContent;
+                    button.textContent = '✅ Shop Added Successfully!';
+                    button.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    button.classList.add('bg-green-500');
+                    button.disabled = true;
+                    
+                    // Immediately refresh shop listings
+                    ShopManager.loadShops();
+                    this.loadShopsForManagement();
+                    
+                    // Reset form after short delay
+                    setTimeout(() => {
+                        document.getElementById('shopForm').reset();
+                        FileUploadManager.clearAllImages();
+                        button.textContent = originalText;
+                        button.classList.remove('bg-green-500');
+                        button.classList.add('bg-green-600', 'hover:bg-green-700');
+                        button.disabled = false;
+                        
+                        alert('🎉 Shop added successfully! You can now see it in the shop listings.');
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error('Error adding shop:', error);
+                    alert('❌ Error adding shop: ' + error.message);
+                }
+            }
+
+            static loadMembers() {
+                const members = DataManager.getMembers();
+                const membersList = document.getElementById('membersList');
+                const noMembers = document.getElementById('noMembers');
+                const cityFilter = document.getElementById('memberCityFilter').value;
+
+                if (members.length === 0) {
+                    membersList.innerHTML = '';
+                    noMembers.classList.remove('hidden');
+                    return;
+                }
+
+                noMembers.classList.add('hidden');
+
+                // Update city filter options
+                const cities = [...new Set(members.map(member => member.city))].sort();
+                const filter = document.getElementById('memberCityFilter');
+                const currentValue = filter.value;
+                filter.innerHTML = '<option value="">All Cities</option>' + 
+                    cities.map(city => `<option value="${city}">${city}</option>`).join('');
+                filter.value = currentValue;
+
+                // Filter members
+                const filteredMembers = cityFilter ? 
+                    members.filter(member => member.city.toLowerCase().includes(cityFilter.toLowerCase())) : 
+                    members;
+
+                // Group by city
+                const membersByCity = filteredMembers.reduce((acc, member) => {
+                    if (!acc[member.city]) acc[member.city] = [];
+                    acc[member.city].push(member);
+                    return acc;
+                }, {});
+
+                membersList.innerHTML = Object.entries(membersByCity).map(([city, cityMembers]) => `
+                    <div class="mb-6">
+                        <h4 class="font-semibold text-gray-700 mb-3 text-lg">📍 ${city} (${cityMembers.length})</h4>
+                        <div class="space-y-2 ml-4">
+                            ${cityMembers.map(member => `
+                                <div class="bg-gray-50 p-3 rounded-lg">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-1">
+                                            <div class="font-medium text-gray-800">${member.firstName} ${member.lastName}</div>
+                                            <div class="text-sm text-gray-600">${member.email} • ${member.phone}</div>
+                                            <div class="text-xs text-gray-500">ID: ${member.memberId} • Joined: ${member.joinDate}</div>
+                                            ${member.physicalCardRequested ? `
+                                                <div class="mt-2 p-2 bg-blue-50 rounded text-xs">
+                                                    <div class="font-medium text-blue-800">📮 Physical Card Requested</div>
+                                                    <div class="text-blue-600">Address: ${member.fullAddress}</div>
+                                                    <div class="text-blue-600">Pincode: ${member.pincode}</div>
+                                                    <div class="text-blue-500">Requested: ${member.cardRequestDate}</div>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                        ${member.physicalCardRequested ? '<div class="text-blue-500 text-xl">📮</div>' : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            static downloadMembersCSV() {
+                const members = DataManager.getMembers();
+                if (members.length === 0) {
+                    alert('No members to download');
+                    return;
+                }
+
+                const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'City', 'Member ID', 'Join Date', 'Physical Card Requested', 'Full Address', 'Pincode', 'Card Request Date'];
+                const csvContent = [
+                    headers.join(','),
+                    ...members.map(member => [
+                        member.firstName,
+                        member.lastName,
+                        member.email,
+                        member.phone,
+                        member.city,
+                        member.memberId,
+                        member.joinDate,
+                        member.physicalCardRequested ? 'Yes' : 'No',
+                        member.fullAddress || '',
+                        member.pincode || '',
+                        member.cardRequestDate || ''
+                    ].join(','))
+                ].join('\n');
+
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `discountclub-members-${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }
+
+            static loadShopsForManagement() {
+                const shops = DataManager.getShops();
+                const shopsList = document.getElementById('shopsList');
+                const noShops = document.getElementById('noShops');
+                const shopCount = document.getElementById('shopCount');
+                const cityFilter = document.getElementById('shopCityFilter').value;
+
+                if (shops.length === 0) {
+                    shopsList.innerHTML = '';
+                    noShops.classList.remove('hidden');
+                    shopCount.textContent = '0 shops';
+                    return;
+                }
+
+                noShops.classList.add('hidden');
+
+                // Update city filter options
+                const cities = [...new Set(shops.map(shop => shop.city))].sort();
+                const filter = document.getElementById('shopCityFilter');
+                const currentValue = filter.value;
+                filter.innerHTML = '<option value="">All Cities</option>' + 
+                    cities.map(city => `<option value="${city}">${city}</option>`).join('');
+                filter.value = currentValue;
+
+                // Filter shops
+                const filteredShops = cityFilter ? 
+                    shops.filter(shop => shop.city.toLowerCase().includes(cityFilter.toLowerCase())) : 
+                    shops;
+
+                shopCount.textContent = `${filteredShops.length} shop${filteredShops.length !== 1 ? 's' : ''}`;
+
+                shopsList.innerHTML = filteredShops.map(shop => `
+                    <div class="bg-gray-50 p-4 rounded-lg border">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <img src="${shop.photos ? shop.photos[0] : shop.photo}" alt="${shop.name}" 
+                                         class="w-12 h-12 object-cover rounded-lg" 
+                                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAxOEgyOFYyNkgyMFYxOFoiIGZpbGw9IiM5QjlCQTAiLz4KPHBhdGggZD0iTTIyIDIwSDI2VjI0SDIyVjIwWiIgZmlsbD0iI0YzRjRGNiIvPgo8dGV4dCB4PSIyNCIgeT0iMzQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5QjlCQTAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjgiPlNob3A8L3RleHQ+Cjwvc3ZnPg=='; this.alt='Shop image';">
+                                    <div>
+                                        <div class="font-semibold text-gray-800">${shop.name}</div>
+                                        <div class="text-sm text-gray-600">📍 ${shop.city} • ${shop.discount}% OFF</div>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-600 mb-2">${shop.description.length > 100 ? shop.description.substring(0, 100) + '...' : shop.description}</div>
+                                <div class="flex items-center gap-2 text-xs text-gray-500">
+                                    <span>ID: ${shop.id}</span>
+                                    ${shop.photos ? `<span>• ${shop.photos.length} photo${shop.photos.length !== 1 ? 's' : ''}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2 ml-4">
+                                <button onclick="AdminManager.viewShopDetails('${shop.id}')" 
+                                        class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors">
+                                    👁️ View
+                                </button>
+                                <button onclick="AdminManager.confirmDeleteShop('${shop.id}', '${shop.name}')" 
+                                        class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            static viewShopDetails(shopId) {
+                ShopManager.showShopModal(shopId);
+            }
+
+            static confirmDeleteShop(shopId, shopName) {
+                const confirmed = confirm(`Are you sure you want to delete "${shopName}"?\n\nThis action cannot be undone.`);
+                if (confirmed) {
+                    this.deleteShop(shopId, shopName);
+                }
+            }
+
+            static deleteShop(shopId, shopName) {
+                try {
+                    DataManager.removeShop(shopId);
+                    
+                    // Refresh all shop displays
+                    ShopManager.loadShops();
+                    this.loadShopsForManagement();
+                    
+                    // Show success message
+                    alert(`✅ "${shopName}" has been deleted successfully!`);
+                    
+                } catch (error) {
+                    console.error('Error deleting shop:', error);
+                    alert('❌ Error deleting shop: ' + error.message);
+                }
+            }
+        }
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', () => {
+            NavigationManager.init();
+            ShopManager.init();
+            MembershipManager.init();
+            AdminManager.init();
+            FileUploadManager.init();
+            AuthManager.init();
+            MembershipCardManager.init();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'980a82e5a2d90e98',t:'MTc1ODEzMjExMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
